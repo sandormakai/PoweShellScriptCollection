@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <SingleServerInstall Used="False">
+    <Servers>
+      <Server>
+        <Name>ServerName</Name>
+        <IPAddress>Ipaddress</IPAddress>
+      </Server>
+    </Servers>
+  </SingleServerInstall>
+  <MultiServerInstall Used="True">
+    <Servers>
+      <Server Type="ManagementServer">
+        <Name>ServerName</Name>
+        <IPAddress>Ipaddress</IPAddress>
+      </Server>
+      <Server Type="RunbookServer">
+        <Name>ServerName</Name>
+        <IPAddress>Ipaddress</IPAddress>
+      </Server>
+      <Server Type="OrchestratorWebServices">
+        <Name>ServerName</Name>
+        <IPAddress>Ipaddress</IPAddress>
+      </Server>
+      <Server Type="RunbookDesigner">
+        <Name>ServerName</Name>
+        <IPAddress>Ipaddress</IPAddress>
+      </Server>
+      <Server Type="OrchestrationConsole">
+        <Name>ServerName</Name>
+        <IPAddress>Ipaddress</IPAddress>
+      </Server>
+      <Server Type="DatabaseServer">
+        <Name>ServerName</Name>
+        <IPAddress>Ipaddress</IPAddress>
+        <NamedInstance>InstanceName</NamedInstance>
+      </Server>
+    </Servers>
+  </MultiServerInstall>
+  
+</configuration>

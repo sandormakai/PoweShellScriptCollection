@@ -1,0 +1,354 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <Hardware>
+
+    <SingleServerInstall>
+        <Servers>
+          <Server Type="All">
+            <CPUFreq>2.1</CPUFreq>
+            <CPUCores>2</CPUCores>
+            <MinRAMMB>1024</MinRAMMB>
+            <RecRAMMB>2048</RecRAMMB>
+            <MinSpaceMB>200</MinSpaceMB>
+            <RecSpaceMB>200</RecSpaceMB>
+          </Server>
+        </Servers>
+    </SingleServerInstall>
+
+    <MultiServerInstall>
+      <Servers>
+        <Server Type="ManagementServer">
+          <CPUFreq>2.1</CPUFreq>
+          <CPUCores>2</CPUCores>
+          <MinRAMMB>1024</MinRAMMB>
+          <RecRAMMB>2048</RecRAMMB>
+          <MinSpaceMB>200</MinSpaceMB>
+          <RecSpaceMB>200</RecSpaceMB>
+        </Server>
+        <Server Type="RunbookServer">
+          <CPUFreq>2.1</CPUFreq>
+          <CPUCores>2</CPUCores>
+          <MinRAMMB>1024</MinRAMMB>
+          <RecRAMMB>2048</RecRAMMB>
+          <MinSpaceMB>200</MinSpaceMB>
+          <RecSpaceMB>200</RecSpaceMB>
+        </Server>
+        <Server Type="OrchestratorWebServices">
+          <CPUFreq>2.1</CPUFreq>
+          <CPUCores>2</CPUCores>
+          <MinRAMMB>1024</MinRAMMB>
+          <RecRAMMB>2048</RecRAMMB>
+          <MinSpaceMB>200</MinSpaceMB>
+          <RecSpaceMB>200</RecSpaceMB>
+        </Server>
+        <Server Type="RunbookDesigner">
+          <CPUFreq>2.1</CPUFreq>
+          <CPUCores>2</CPUCores>
+          <MinRAMMB>1024</MinRAMMB>
+          <RecRAMMB>2048</RecRAMMB>
+          <MinSpaceMB>200</MinSpaceMB>
+          <RecSpaceMB>200</RecSpaceMB>
+        </Server>
+        <Server Type="OrchestrationConsole">
+          <CPUFreq>2.1</CPUFreq>
+          <CPUCores>2</CPUCores>
+          <MinRAMMB>1024</MinRAMMB>
+          <RecRAMMB>2048</RecRAMMB>
+          <MinSpaceMB>200</MinSpaceMB>
+          <RecSpaceMB>200</RecSpaceMB>
+        </Server>
+        <Server Type="DatabaseServer">
+          <CPUFreq>2.1</CPUFreq>
+          <CPUCores>2</CPUCores>
+          <MinRAMMB>1024</MinRAMMB>
+          <RecRAMMB>2048</RecRAMMB>
+          <MinSpaceMB>200</MinSpaceMB>
+          <RecSpaceMB>200</RecSpaceMB>
+        </Server>
+      </Servers>
+    </MultiServerInstall>
+
+  </Hardware>
+ 
+  <Software>
+    
+    <SingleServerInstall>
+      <Servers>
+        <Server Type="All">
+          <DomainJoined>
+            <WMIRoot>root\cimv2</WMIRoot>
+            <WMIClass>Win32_ComputerSystem</WMIClass>
+            <WMIProperty>DomainRole</WMIProperty>
+            <Value>3</Value>
+          </DomainJoined>
+          <OperatingSystem>
+            <VersionNumber Name="2008R2">6.1.7600</VersionNumber>
+            <Edition Name="2008R2">All</Edition>
+            <VersionNumber Name="2012">6.2.9200</VersionNumber>
+            <Edition Name="2012">Standard,Datacenter</Edition>
+            <VersionNumber Name="2012R2">6.3.9200</VersionNumber>
+            <Edition Name="2012R2">Standard,Datacenter</Edition>
+          </OperatingSystem>
+          <Database Name="Microsoft SQL Server">
+            <Versions>
+              <VersionNumber Name="2008R2">10.50</VersionNumber>
+              <VersionNumber Name="2012">11</VersionNumber>
+              <VersionNumber Name="2012R2">12</VersionNumber>
+            </Versions>
+            <Collation>SQL_Latin1_General_CP1_CI_AS</Collation>
+          </Database>
+          <AdditionalSoftware Name=".NET Framework 3.5 SP1">
+            <Registry Value="True">
+              <Root>HKLM</Root>
+              <Path>Software\Microsoft\NET Framework Setup\NDP\v3.5</Path>
+              <Key>SP</Key>
+              <Value>1</Value>
+            </Registry>
+            <WMI Value="False">
+              <Root></Root>
+              <Class></Class>
+              <Property></Property>
+              <Value></Value>
+            </WMI>
+          </AdditionalSoftware>
+          <AdditionalSoftware Name=".NET Framework 4.5">
+            <Registry Value="True">
+              <Root>HKLM</Root>
+              <Path>Software\Microsoft\NET Framework Setup\NDP\v4\Full</Path>
+              <Key>Release</Key>
+              <Value>378389</Value>
+            </Registry>
+            <WMI Value="False">
+              <Root></Root>
+              <Class></Class>
+              <Property></Property>
+              <Value></Value>
+            </WMI>
+          </AdditionalSoftware>
+          <AdditionalSoftware Name="WCF HTTP Activation for .NET 4.5">
+            <Registry Value="True">
+              <Root>HKLM</Root>
+              <Path>SOFTWARE\Microsoft\ServerManager\ServicingStorage\ServerComponentCache\NET-WCF-HTTP-Activation45</Path>
+              <Key>InstallState</Key>
+              <Value>1</Value>
+            </Registry>
+            <WMI Value="False">
+              <Root></Root>
+              <Class></Class>
+              <Property></Property>
+              <Value></Value>
+            </WMI>
+          </AdditionalSoftware>
+        </Server>
+      </Servers>
+    </SingleServerInstall>
+
+    <MultiServerInstall>
+      <Servers>
+        <Server Type="ManagementServer">
+          <DomainJoined>
+            <WMIRoot>root\cimv2</WMIRoot>
+            <WMIClass>Win32_ComputerSystem</WMIClass>
+            <WMIProperty>DomainRole</WMIProperty>
+            <Value>3</Value>
+          </DomainJoined>
+          <OperatingSystem>
+            <VersionNumber Name="2008R2">6.1.7600</VersionNumber>
+            <Edition Name="2008R2">All</Edition>
+            <VersionNumber Name="2012">6.2.9200</VersionNumber>
+            <Edition Name="2012">Standard,Datacenter</Edition>
+            <VersionNumber Name="2012R2">6.3.9200</VersionNumber>
+            <Edition Name="2012R2">Standard,Datacenter</Edition>
+          </OperatingSystem>
+          <AdditionalSoftware Name=".NET Framework 3.5 SP1">
+            <Registry Value="True">
+              <Root>HKLM</Root>
+              <Path>Software\Microsoft\NET Framework Setup\NDP\v3.5</Path>
+              <Key>SP</Key>
+              <Value>1</Value>
+            </Registry>
+            <WMI Value="False">
+              <Root></Root>
+              <Class></Class>
+              <Property></Property>
+              <Value></Value>
+            </WMI>
+          </AdditionalSoftware>
+        </Server>
+        <Server Type="RunbookServer">
+          <DomainJoined>
+            <WMIRoot>root\cimv2</WMIRoot>
+            <WMIClass>Win32_ComputerSystem</WMIClass>
+            <WMIProperty>DomainRole</WMIProperty>
+            <Value>3</Value>
+          </DomainJoined>
+          <OperatingSystem>
+            <VersionNumber Name="2008R2">6.1.7600</VersionNumber>
+            <Edition Name="2008R2">All</Edition>
+            <VersionNumber Name="2012">6.2.9200</VersionNumber>
+            <Edition Name="2012">Standard,Datacenter</Edition>
+            <VersionNumber Name="2012R2">6.3.9200</VersionNumber>
+            <Edition Name="2012R2">Standard,Datacenter</Edition>
+          </OperatingSystem>
+          <AdditionalSoftware Name=".NET Framework 3.5 SP1">
+            <Registry Value="True">
+              <Root>HKLM</Root>
+              <Path>Software\Microsoft\NET Framework Setup\NDP\v3.5</Path>
+              <Key>SP</Key>
+              <Value>1</Value>
+            </Registry>
+            <WMI Value="False">
+              <Root></Root>
+              <Class></Class>
+              <Property></Property>
+              <Value></Value>
+            </WMI>
+          </AdditionalSoftware>
+        </Server>
+        <Server Type="OrchestratorWebServices">
+          <DomainJoined>
+            <WMIRoot>root\cimv2</WMIRoot>
+            <WMIClass>Win32_ComputerSystem</WMIClass>
+            <WMIProperty>DomainRole</WMIProperty>
+            <Value>3</Value>
+          </DomainJoined>
+          <OperatingSystem>
+            <VersionNumber Name="2008R2">6.1.7600</VersionNumber>
+            <Edition Name="2008R2">All</Edition>
+            <VersionNumber Name="2012">6.2.9200</VersionNumber>
+            <Edition Name="2012">Standard,Datacenter</Edition>
+            <VersionNumber Name="2012R2">6.3.9200</VersionNumber>
+            <Edition Name="2012R2">Standard,Datacenter</Edition>
+          </OperatingSystem>
+          <AdditionalSoftware Name=".NET Framework 3.5 SP1">
+            <Registry Value="True">
+              <Root>HKLM</Root>
+              <Path>Software\Microsoft\NET Framework Setup\NDP\v3.5</Path>
+              <Key>SP</Key>
+              <Value>1</Value>
+            </Registry>
+            <WMI Value="False">
+              <Root></Root>
+              <Class></Class>
+              <Property></Property>
+              <Value></Value>
+            </WMI>
+          </AdditionalSoftware>
+          <AdditionalSoftware Name=".NET Framework 4.5">
+            <Registry Value="True">
+              <Root>HKLM</Root>
+              <Path>Software\Microsoft\NET Framework Setup\NDP\v4\Full</Path>
+              <Key>Release</Key>
+              <Value>378389</Value>
+            </Registry>
+            <WMI Value="False">
+              <Root></Root>
+              <Class></Class>
+              <Property></Property>
+              <Value></Value>
+            </WMI>
+          </AdditionalSoftware>
+          <AdditionalSoftware Name="WCF HTTP Activation for .NET 4.5">
+            <Registry Value="True">
+              <Root>HKLM</Root>
+              <Path>SOFTWARE\Microsoft\ServerManager\ServicingStorage\ServerComponentCache\NET-WCF-HTTP-Activation45</Path>
+              <Key>InstallState</Key>
+              <Value>1</Value>
+            </Registry>
+            <WMI Value="False">
+              <Root></Root>
+              <Class></Class>
+              <Property></Property>
+              <Value></Value>
+            </WMI>
+          </AdditionalSoftware>
+        </Server>
+        <Server Type="RunbookDesigner">
+          <DomainJoined>
+            <WMIRoot>root\cimv2</WMIRoot>
+            <WMIClass>Win32_ComputerSystem</WMIClass>
+            <WMIProperty>DomainRole</WMIProperty>
+            <Value>3</Value>
+          </DomainJoined>
+          <OperatingSystem>
+            <VersionNumber Name="2008R2">6.1.7600</VersionNumber>
+            <Edition Name="2008R2">All</Edition>
+            <VersionNumber Name="2012">6.2.9200</VersionNumber>
+            <Edition Name="2012">Standard,Datacenter</Edition>
+            <VersionNumber Name="2012R2">6.3.9200</VersionNumber>
+            <Edition Name="2012R2">Standard,Datacenter</Edition>
+          </OperatingSystem>
+          <AdditionalSoftware Name=".NET Framework 3.5 SP1">
+            <Registry Value="True">
+              <Root>HKLM</Root>
+              <Path>Software\Microsoft\NET Framework Setup\NDP\v3.5</Path>
+              <Key>SP</Key>
+              <Value>1</Value>
+            </Registry>
+            <WMI Value="False">
+              <Root></Root>
+              <Class></Class>
+              <Property></Property>
+              <Value></Value>
+            </WMI>
+          </AdditionalSoftware>
+        </Server>
+        <Server Type="OrchestrationConsole">
+          <DomainJoined>
+            <WMIRoot>root\cimv2</WMIRoot>
+            <WMIClass>Win32_ComputerSystem</WMIClass>
+            <WMIProperty>DomainRole</WMIProperty>
+            <Value>3</Value>
+          </DomainJoined>
+          <OperatingSystem>
+            <VersionNumber Name="2008R2">6.1.7600</VersionNumber>
+            <Edition Name="2008R2">All</Edition>
+            <VersionNumber Name="2012">6.2.9200</VersionNumber>
+            <Edition Name="2012">Standard,Datacenter</Edition>
+            <VersionNumber Name="2012R2">6.3.9200</VersionNumber>
+            <Edition Name="2012R2">Standard,Datacenter</Edition>
+          </OperatingSystem>
+          <AdditionalSoftware Name=".NET Framework 3.5 SP1">
+            <Registry Value="True">
+              <Root>HKLM</Root>
+              <Path>Software\Microsoft\NET Framework Setup\NDP\v3.5</Path>
+              <Key>SP</Key>
+              <Value>1</Value>
+            </Registry>
+            <WMI Value="False">
+              <Root></Root>
+              <Class></Class>
+              <Property></Property>
+              <Value></Value>
+            </WMI>
+          </AdditionalSoftware>
+        </Server>
+        <Server Type="DatabaseServer">
+          <DomainJoined>
+            <WMIRoot>root\cimv2</WMIRoot>
+            <WMIClass>Win32_ComputerSystem</WMIClass>
+            <WMIProperty>DomainRole</WMIProperty>
+            <Value>3</Value>
+          </DomainJoined>
+          <OperatingSystem>
+            <VersionNumber Name="2008R2">6.1.7600</VersionNumber>
+            <Edition Name="2008R2">All</Edition>
+            <VersionNumber Name="2012">6.2.9200</VersionNumber>
+            <Edition Name="2012">Standard,Datacenter</Edition>
+            <VersionNumber Name="2012R2">6.3.9200</VersionNumber>
+            <Edition Name="2012R2">Standard,Datacenter</Edition>
+          </OperatingSystem>
+          <Database Name="Microsoft SQL Server">
+            <Versions>
+              <VersionNumber Name="2008R2">10.50</VersionNumber>
+              <VersionNumber Name="2012">11</VersionNumber>
+              <VersionNumber Name="2012R2">12</VersionNumber>
+            </Versions>
+            <Collation>SQL_Latin1_General_CP1_CI_AS</Collation>
+          </Database>
+        </Server>
+      </Servers>
+    </MultiServerInstall>
+    
+  </Software>
+</configuration>

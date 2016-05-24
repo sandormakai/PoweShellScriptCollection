@@ -26,9 +26,18 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Compile Include="Script.ps1" />
+    <Folder Include="Config Files\" />
+    <Folder Include="Script Files\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Config Files\InfrastructureServers.xml" />
+    <Compile Include="Script Files\Logging.ps1" />
+    <Compile Include="Script Files\PrereqChecker.ps1" />
+    <Compile Include="Script Files\HardwareCheck.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Config Files\PrerequisiteSettings.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
