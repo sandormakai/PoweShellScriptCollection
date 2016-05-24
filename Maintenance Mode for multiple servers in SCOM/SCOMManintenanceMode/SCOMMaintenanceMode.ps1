@@ -2,6 +2,18 @@
 # Script.ps1
 #
 ###################### INIT #############################################################
+[CmdletBinding()]
+Param(
+	[Parameter(Mandatory=$True)]
+	[Alias("ManagementServer","MgtServer","MS")]
+	[ValidateNotNullOrEmpty()]
+	[string]$strServerName,
+	
+	[Parameter(Mandatory=$True)]
+	[ValidateScript({Test-Path $_ -PathType ‘Leaf’})]
+	[Alias("FilePath","FP")]
+	[string]$strFilePath
+)
 
 $strScriptPath = $NULL
 $strScriptName = $NULL
@@ -40,3 +52,17 @@ If (-not($strScriptPath = Get-ScriptDirectory)) {
 $strScriptName = ($MyInvocation.MyCommand.Name).Substring(0,($MyInvocation.MyCommand.Name).Length-4)
 $strLogFile = ($strScriptPath + "\" + $strScriptName + ".log")
 
+################### Check whether the script was started in SCOM shell or not ######################
+if(-not (Get-Module | ? {$_.Name -eq “OperationsManager”})) {
+	if(Get-Module -ListAvailable | ? {$_.Name -eq “OperationsManager”}) {
+		Import-Module OperationsManager
+	}
+	Else {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "The PS Module named OperationsManager is not available on this machine. Please run the script again on a server where this module is available."
+		Exit(-1)
+	}
+}
+
+################### Connect to Management Server ###################################################
+If 
+New-SCOMManagementGroupConnection -ComputerName $strServerName
