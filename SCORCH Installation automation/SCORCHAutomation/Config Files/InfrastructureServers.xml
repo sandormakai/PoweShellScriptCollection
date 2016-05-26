@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<configuration>
+<configuration Type="Infrastructure">
   <SingleServerInstall Used="False">
     <Servers>
-      <Server>
+      <Server Type="All">
         <Name>ServerName</Name>
         <IPAddress>Ipaddress</IPAddress>
       </Server>

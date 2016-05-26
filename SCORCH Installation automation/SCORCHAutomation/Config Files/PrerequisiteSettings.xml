@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<configuration>
+<configuration Type="Prerequisite">
   <Hardware>
 
     <SingleServerInstall>
@@ -11,6 +11,7 @@
             <RecRAMMB>2048</RecRAMMB>
             <MinSpaceMB>200</MinSpaceMB>
             <RecSpaceMB>200</RecSpaceMB>
+            <InstallationDrive>C</InstallationDrive>
           </Server>
         </Servers>
     </SingleServerInstall>
@@ -24,6 +25,7 @@
           <RecRAMMB>2048</RecRAMMB>
           <MinSpaceMB>200</MinSpaceMB>
           <RecSpaceMB>200</RecSpaceMB>
+          <InstallationDrive>C</InstallationDrive>
         </Server>
         <Server Type="RunbookServer">
           <CPUFreq>2.1</CPUFreq>
@@ -32,6 +34,7 @@
           <RecRAMMB>2048</RecRAMMB>
           <MinSpaceMB>200</MinSpaceMB>
           <RecSpaceMB>200</RecSpaceMB>
+          <InstallationDrive>C</InstallationDrive>
         </Server>
         <Server Type="OrchestratorWebServices">
           <CPUFreq>2.1</CPUFreq>
@@ -40,6 +43,7 @@
           <RecRAMMB>2048</RecRAMMB>
           <MinSpaceMB>200</MinSpaceMB>
           <RecSpaceMB>200</RecSpaceMB>
+          <InstallationDrive>C</InstallationDrive>
         </Server>
         <Server Type="RunbookDesigner">
           <CPUFreq>2.1</CPUFreq>
@@ -48,6 +52,7 @@
           <RecRAMMB>2048</RecRAMMB>
           <MinSpaceMB>200</MinSpaceMB>
           <RecSpaceMB>200</RecSpaceMB>
+          <InstallationDrive>C</InstallationDrive>
         </Server>
         <Server Type="OrchestrationConsole">
           <CPUFreq>2.1</CPUFreq>
@@ -56,6 +61,7 @@
           <RecRAMMB>2048</RecRAMMB>
           <MinSpaceMB>200</MinSpaceMB>
           <RecSpaceMB>200</RecSpaceMB>
+          <InstallationDrive>C</InstallationDrive>
         </Server>
         <Server Type="DatabaseServer">
           <CPUFreq>2.1</CPUFreq>
@@ -64,6 +70,7 @@
           <RecRAMMB>2048</RecRAMMB>
           <MinSpaceMB>200</MinSpaceMB>
           <RecSpaceMB>200</RecSpaceMB>
+          <InstallationDrive>C</InstallationDrive>
         </Server>
       </Servers>
     </MultiServerInstall>
@@ -110,6 +117,7 @@
               <Property></Property>
               <Value></Value>
             </WMI>
+            <InstallSource></InstallSource>
           </AdditionalSoftware>
           <AdditionalSoftware Name=".NET Framework 4.5">
             <Registry Value="True">
@@ -124,6 +132,7 @@
               <Property></Property>
               <Value></Value>
             </WMI>
+            <InstallSource></InstallSource>
           </AdditionalSoftware>
           <AdditionalSoftware Name="WCF HTTP Activation for .NET 4.5">
             <Registry Value="True">
@@ -138,6 +147,7 @@
               <Property></Property>
               <Value></Value>
             </WMI>
+            <InstallSource></InstallSource>
           </AdditionalSoftware>
         </Server>
       </Servers>
@@ -173,6 +183,7 @@
               <Property></Property>
               <Value></Value>
             </WMI>
+            <InstallSource></InstallSource>
           </AdditionalSoftware>
         </Server>
         <Server Type="RunbookServer">
@@ -204,6 +215,7 @@
               <Value></Value>
             </WMI>
           </AdditionalSoftware>
+          <InstallSource></InstallSource>
         </Server>
         <Server Type="OrchestratorWebServices">
           <DomainJoined>
@@ -233,6 +245,7 @@
               <Property></Property>
               <Value></Value>
             </WMI>
+            <InstallSource></InstallSource>
           </AdditionalSoftware>
           <AdditionalSoftware Name=".NET Framework 4.5">
             <Registry Value="True">
@@ -247,6 +260,7 @@
               <Property></Property>
               <Value></Value>
             </WMI>
+            <InstallSource></InstallSource>
           </AdditionalSoftware>
           <AdditionalSoftware Name="WCF HTTP Activation for .NET 4.5">
             <Registry Value="True">
@@ -262,6 +276,7 @@
               <Value></Value>
             </WMI>
           </AdditionalSoftware>
+          <InstallSource></InstallSource>
         </Server>
         <Server Type="RunbookDesigner">
           <DomainJoined>
@@ -292,6 +307,7 @@
               <Value></Value>
             </WMI>
           </AdditionalSoftware>
+          <InstallSource></InstallSource>
         </Server>
         <Server Type="OrchestrationConsole">
           <DomainJoined>
@@ -322,6 +338,7 @@
               <Value></Value>
             </WMI>
           </AdditionalSoftware>
+          <InstallSource></InstallSource>
         </Server>
         <Server Type="DatabaseServer">
           <DomainJoined>
