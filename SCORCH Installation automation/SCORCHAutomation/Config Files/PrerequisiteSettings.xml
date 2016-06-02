@@ -5,7 +5,7 @@
     <SingleServerInstall>
         <Servers>
           <Server Type="All">
-            <CPUFreq>2.1</CPUFreq>
+            <CPUSpeed>2100</CPUSpeed>
             <CPUCores>2</CPUCores>
             <MinRAMMB>1024</MinRAMMB>
             <RecRAMMB>2048</RecRAMMB>
@@ -19,7 +19,7 @@
     <MultiServerInstall>
       <Servers>
         <Server Type="ManagementServer">
-          <CPUFreq>2.1</CPUFreq>
+          <CPUSpeed>2100</CPUSpeed>
           <CPUCores>2</CPUCores>
           <MinRAMMB>1024</MinRAMMB>
           <RecRAMMB>2048</RecRAMMB>
@@ -28,7 +28,7 @@
           <InstallationDrive>C</InstallationDrive>
         </Server>
         <Server Type="RunbookServer">
-          <CPUFreq>2.1</CPUFreq>
+          <CPUSpeed>2100</CPUSpeed>
           <CPUCores>2</CPUCores>
           <MinRAMMB>1024</MinRAMMB>
           <RecRAMMB>2048</RecRAMMB>
@@ -37,7 +37,7 @@
           <InstallationDrive>C</InstallationDrive>
         </Server>
         <Server Type="OrchestratorWebServices">
-          <CPUFreq>2.1</CPUFreq>
+          <CPUSpeed>2100</CPUSpeed>
           <CPUCores>2</CPUCores>
           <MinRAMMB>1024</MinRAMMB>
           <RecRAMMB>2048</RecRAMMB>
@@ -46,7 +46,7 @@
           <InstallationDrive>C</InstallationDrive>
         </Server>
         <Server Type="RunbookDesigner">
-          <CPUFreq>2.1</CPUFreq>
+          <CPUSpeed>2100</CPUSpeed>
           <CPUCores>2</CPUCores>
           <MinRAMMB>1024</MinRAMMB>
           <RecRAMMB>2048</RecRAMMB>
@@ -55,7 +55,7 @@
           <InstallationDrive>C</InstallationDrive>
         </Server>
         <Server Type="OrchestrationConsole">
-          <CPUFreq>2.1</CPUFreq>
+          <CPUSpeed>2100</CPUSpeed>
           <CPUCores>2</CPUCores>
           <MinRAMMB>1024</MinRAMMB>
           <RecRAMMB>2048</RecRAMMB>
@@ -64,7 +64,7 @@
           <InstallationDrive>C</InstallationDrive>
         </Server>
         <Server Type="DatabaseServer">
-          <CPUFreq>2.1</CPUFreq>
+          <CPUSpeed>2100</CPUSpeed>
           <CPUCores>2</CPUCores>
           <MinRAMMB>1024</MinRAMMB>
           <RecRAMMB>2048</RecRAMMB>
@@ -89,12 +89,18 @@
             <Value>3</Value>
           </DomainJoined>
           <OperatingSystem>
-            <VersionNumber Name="2008R2">6.1.7600</VersionNumber>
-            <Edition Name="2008R2">All</Edition>
-            <VersionNumber Name="2012">6.2.9200</VersionNumber>
-            <Edition Name="2012">Standard,Datacenter</Edition>
-            <VersionNumber Name="2012R2">6.3.9200</VersionNumber>
-            <Edition Name="2012R2">Standard,Datacenter</Edition>
+            <Version Name="2008R2">
+              <VersionNumber>6.1.7600</VersionNumber>
+              <Edition>All</Edition>
+            </Version>
+            <Version Name="2012">
+              <VersionNumber>6.2.9200</VersionNumber>
+              <Edition>Standard,Datacenter</Edition>
+            </Version>
+            <Version Name="2012R2">
+              <VersionNumber>6.3.9200</VersionNumber>
+              <Edition>Standard,Datacenter</Edition>
+            </Version>
           </OperatingSystem>
           <Database Name="Microsoft SQL Server">
             <Versions>

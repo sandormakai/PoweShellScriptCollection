@@ -11,27 +11,27 @@
   <MultiServerInstall Used="True">
     <Servers>
       <Server Type="ManagementServer">
-        <Name>ServerName</Name>
+        <Name>ServerName1</Name>
         <IPAddress>Ipaddress</IPAddress>
       </Server>
       <Server Type="RunbookServer">
-        <Name>ServerName</Name>
+        <Name>ServerName2</Name>
         <IPAddress>Ipaddress</IPAddress>
       </Server>
       <Server Type="OrchestratorWebServices">
-        <Name>ServerName</Name>
+        <Name>ServerName3</Name>
         <IPAddress>Ipaddress</IPAddress>
       </Server>
       <Server Type="RunbookDesigner">
-        <Name>ServerName</Name>
+        <Name>ServerName2</Name>
         <IPAddress>Ipaddress</IPAddress>
       </Server>
       <Server Type="OrchestrationConsole">
-        <Name>ServerName</Name>
+        <Name>ServerName2</Name>
         <IPAddress>Ipaddress</IPAddress>
       </Server>
       <Server Type="DatabaseServer">
-        <Name>ServerName</Name>
+        <Name>ServerName4</Name>
         <IPAddress>Ipaddress</IPAddress>
         <NamedInstance>InstanceName</NamedInstance>
       </Server>

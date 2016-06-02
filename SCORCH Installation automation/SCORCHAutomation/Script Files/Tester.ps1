@@ -1,20 +1,36 @@
 #
 # Tester.ps1
 #
-$strXmlFilesPath = "C:\Users\sandor.makai\OneDrive - Inframon 1\Source\Repos\PoweShellScriptCollection\SCORCH Installation automation\SCORCHAutomation\Config Files"
-$colXMLFiles = Get-ChildItem -Path $strXmlFilesPath
-[xml]$xmlTemp = $null
-[xml]$xmlInfra = $null
-[xml]$xmlPrereq = $null
-foreach ($objXMLFile in $colXMLFiles) {
-	$xmlTemp = Get-Content $objXMLFile.FullName
-	If ($xmlTemp.configuration.Type -eq "Infrastructure") {
-		$xmlInfra = $xmlTemp
-	} ElseIf ($xmlTemp.configuration.Type -eq "Prerequisite") {
-		$xmlPrereq = $xmlTemp
-	}
-	$xmlTemp = $null
+$colServers = @()
+[xml]$testXML = Get-Content D:\Temp\InfrastructureServers.xml
+[xml]$testXML2 = Get-Content D:\Temp\PrerequisiteSettings.xml
+foreach ($server in $testXML2.configuration.Software.SingleServerInstall.Servers.Server.OperatingSystem.Version) {
+	Write-Host ("ServerName: " + $server.Name)
+	$objServer = New-Object –TypeName PSObject
+	$objServer | Add-Member –MemberType NoteProperty –Name Name –Value $testXML.configuration.SingleServerInstall.Servers.Server.Name
+	$objServer | Add-Member –MemberType NoteProperty –Name IPAddress –Value $testXML.configuration.SingleServerInstall.Servers.Server.IPAddress
+	$objServer | Add-Member –MemberType NoteProperty –Name ServerRole –Value $testXML.configuration.SingleServerInstall.Servers.Server.Type
+	$objServer | Add-Member –MemberType NoteProperty –Name OSName –Value $server.Name
+	$objServer | Add-Member –MemberType NoteProperty –Name VersionNumber –Value $server.VersionNumber
+	$objServer | Add-Member –MemberType NoteProperty –Name Editions –Value $server.Edition
+	$colServers += $objServer
 }
 
-Write-Host "xmlInfra: " $xmlInfra.configuration.Type
-Write-Host "xmlPrereq: " $xmlPrereq.configuration.Type
+$colServers
+
+#foreach ($server in $testXML2.configuration.hardware.MultiServerInstall.Servers.Server) {
+#	foreach ($object in $colServers) {
+#		If ($server.Type -eq $object.ServerRole) {
+#			$object.CPUSpeed = $server.CPUSpeed
+#			$object.CPUCores = $server.CPUCores
+#			$object.MinRAMMB = $server.MinRAMMB
+#			$object.RecRAMMB = $server.RecRAMMB
+#			$object.MinSpaceMB = $server.MinSpaceMB
+#			$object.RecSpaceMB = $server.RecSpaceMB
+#			$object.InstallationDrive = $server.InstallationDrive
+#		}
+#	}
+#}
+
+#$colServers
+

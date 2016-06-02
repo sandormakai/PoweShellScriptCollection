@@ -33,6 +33,105 @@ function New-RemotePSConnection ([string]$strComputerName, [System.Management.Au
 	Return $objSession
 }
 
+function Get-ServerHardwareCollection() {
+	Param(
+		[Parameter(Mandatory=$True,ParameterSetName=’Single’)]
+		[ValidateNotNullOrEmpty()]
+		[switch]$Single,
+		[Parameter(Mandatory=$True,ParameterSetName=’Multi’)]
+		[ValidateNotNullOrEmpty()]
+		[switch]$Multi,
+		[Parameter(Mandatory=$True)]
+		[xml]$xmlServers,
+		[Parameter(Mandatory=$True)]
+		[xml]$xmlSettings
+	)
+
+	If ($Single -eq $True) {
+		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Get-ServerHardwareCollection called with parameter Single = " + $Single)
+		$colServers = @()
+		$objServer = New-Object –TypeName PSObject
+		$objServer | Add-Member –MemberType NoteProperty –Name Name –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.Name
+		$objServer | Add-Member –MemberType NoteProperty –Name IPAddress –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.IPAddress
+		$objServer | Add-Member –MemberType NoteProperty –Name ServerRole –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.Type
+		$objServer | Add-Member –MemberType NoteProperty –Name CPUSpeed –Value $xmlSettings.configuration.Hardware.SingleServerInstall.Servers.Server.CPUSpeed
+		$objServer | Add-Member –MemberType NoteProperty –Name CPUCores –Value $xmlSettings.configuration.Hardware.SingleServerInstall.Servers.Server.CPUCores
+		$objServer | Add-Member –MemberType NoteProperty –Name MinRAMMB –Value $xmlSettings.configuration.Hardware.SingleServerInstall.Servers.Server.MinRAMMB
+		$objServer | Add-Member –MemberType NoteProperty –Name RecRAMMB –Value $xmlSettings.configuration.Hardware.SingleServerInstall.Servers.Server.RecRAMMB
+		$objServer | Add-Member –MemberType NoteProperty –Name MinSpaceMB –Value $xmlSettings.configuration.Hardware.SingleServerInstall.Servers.Server.MinSpaceMB
+		$objServer | Add-Member –MemberType NoteProperty –Name RecSpaceMB –Value $xmlSettings.configuration.Hardware.SingleServerInstall.Servers.Server.RecSpaceMB
+		$objServer | Add-Member –MemberType NoteProperty –Name InstallationDrive –Value $xmlSettings.configuration.Hardware.SingleServerInstall.Servers.Server.InstallationDrive
+		$colServers += $objServer
+	} ElseIf ($Multi -eq $True) {
+		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Get-ServerHardwareCollection called with parameter Multi = " + $Multi)
+		$colServers = @()
+		foreach ($objItem in $xmlServers.configuration.MultiServerInstall.Servers.Server) {
+			$objServer = New-Object –TypeName PSObject
+			$objServer | Add-Member –MemberType NoteProperty –Name Name –Value $objItem.Name
+			$objServer | Add-Member –MemberType NoteProperty –Name IPAddress –Value $objItem.IPAddress
+			$objServer | Add-Member –MemberType NoteProperty –Name ServerRole –Value $objItem.Type
+			$objServer | Add-Member –MemberType NoteProperty –Name CPUSpeed –Value ""
+			$objServer | Add-Member –MemberType NoteProperty –Name CPUCores –Value ""
+			$objServer | Add-Member –MemberType NoteProperty –Name MinRAMMB –Value ""
+			$objServer | Add-Member –MemberType NoteProperty –Name RecRAMMB –Value ""
+			$objServer | Add-Member –MemberType NoteProperty –Name MinSpaceMB –Value ""
+			$objServer | Add-Member –MemberType NoteProperty –Name RecSpaceMB –Value ""
+			$objServer | Add-Member –MemberType NoteProperty –Name InstallationDrive –Value ""
+			$colServers += $objServer
+		}
+		foreach ($objHardware in $xmlSettings.configuration.hardware.MultiServerInstall.Servers.Server) {
+			foreach ($objItem in $colServers) {
+				If ($objHardware.Type -eq $objItem.ServerRole) {
+					$objItem.CPUSpeed = $objHardware.CPUSpeed
+					$objItem.CPUCores = $objHardware.CPUCores
+					$objItem.MinRAMMB = $objHardware.MinRAMMB
+					$objItem.RecRAMMB = $objHardware.RecRAMMB
+					$objItem.MinSpaceMB = $objHardware.MinSpaceMB
+					$objItem.RecSpaceMB = $objHardware.RecSpaceMB
+					$objItem.InstallationDrive = $objHardware.InstallationDrive
+				}
+			}
+		}
+	} Else {
+		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Something went wrong with calling Get-ServerHardwareCollection")
+	}
+	return $colServers
+}
+
+function Get-RoleSupportedOSCollection() {
+	Param(
+		[Parameter(Mandatory=$True,ParameterSetName=’Single’)]
+		[ValidateNotNullOrEmpty()]
+		[switch]$Single,
+		[Parameter(Mandatory=$True,ParameterSetName=’Multi’)]
+		[ValidateNotNullOrEmpty()]
+		[switch]$Multi,
+		[Parameter(Mandatory=$True)]
+		[xml]$xmlServers,
+		[Parameter(Mandatory=$True)]
+		[xml]$xmlSettings
+	)
+	If ($Single -eq $True) {
+		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Get-RoleSupportedOSCollection called with parameter Single = " + $Single)
+		$colServers = @()
+		foreach ($objItem in $xmlSettings.configuration.Software.SingleServerInstall.Servers.Server.OperatingSystem.Version) {
+			$objServer = New-Object –TypeName PSObject
+			$objServer | Add-Member –MemberType NoteProperty –Name Name –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.Name
+			$objServer | Add-Member –MemberType NoteProperty –Name IPAddress –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.IPAddress
+			$objServer | Add-Member –MemberType NoteProperty –Name ServerRole –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.Type
+			$objServer | Add-Member –MemberType NoteProperty –Name OSName –Value $objItem.Name
+			$objServer | Add-Member –MemberType NoteProperty –Name VersionNumber –Value $objItem.VersionNumber
+			$objServer | Add-Member –MemberType NoteProperty –Name Editions –Value $objItem.Edition
+			$colServers += $objServer
+		}
+	} ElseIf ($Multi -eq $True) {
+		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Get-RoleSupportedOSCollection called with parameter Multi = " + $Multi)
+	} Else {
+		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Something went wrong with calling Get-RoleSupportedOSCollection")
+	}
+	return $colServers
+}
+
 function Get-RegistryValue () {
 
 }
