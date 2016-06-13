@@ -136,8 +136,10 @@ If ($xmlInfra.configuration.SingleServerInstall.Used -eq "True") {
 	$blnMultiServerInstall = $true
 	Write-Host -ForegroundColor Green "MULTI"
 	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData "Multi server deployment"
-	$colTemp = Get-ServerHardwareCollection -Multi -xmlServers $xmlInfra -xmlSettings $xmlPrereq
-	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colTemp
+	$colMultiHardwareRequirements = Get-ServerHardwareCollection -Multi -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colMultiHardwareRequirements
+	$colMultiSupportedOS = Get-RoleSupportedOSCollection -Multi -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colMultiSupportedOS
 } Else {
 	LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "Both Single and Multi server deployment marked as `"FALSE`". At lease one needs to be set to `"TRUE`"..."
 	Write-Host -ForegroundColor Red "ERROR"
