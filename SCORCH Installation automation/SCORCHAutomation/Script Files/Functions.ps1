@@ -126,6 +126,23 @@ function Get-RoleSupportedOSCollection() {
 		}
 	} ElseIf ($Multi -eq $True) {
 		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Get-RoleSupportedOSCollection called with parameter Multi = " + $Multi)
+		$colServers = @()
+		foreach ($objItem in $xmlSettings.configuration.MultiServerInstall.Servers.Server) {
+			$objServer = New-Object –TypeName PSObject
+			foreach ($objOS in $xmlSettings.configuration.MultiServerInstall.Servers.Server.OperatingSystem.Verison) {
+				foreach ($objServerInfo in $xmlServers.configuration.MultiServerInstall.Servers.Server) {
+					If ($objServerInfo.Type -eq $objItem.Type) {
+									$objServer | Add-Member –MemberType NoteProperty –Name Name –Value $objServerInfo.Name
+									$objServer | Add-Member –MemberType NoteProperty –Name IPAddress –Value $objServerInfo.IPAddress
+									$objServer | Add-Member –MemberType NoteProperty –Name ServerRole –Value $objServerInfo.Type
+					}
+					$objServer | Add-Member –MemberType NoteProperty –Name OSName –Value $objOS.Name
+					$objServer | Add-Member –MemberType NoteProperty –Name VersionNumber –Value $objOS.VersionNumber
+					$objServer | Add-Member –MemberType NoteProperty –Name Editions –Value $objOS.Edition
+					$colServers += $objServer
+				}
+			}	
+		}
 	} Else {
 		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Something went wrong with calling Get-RoleSupportedOSCollection")
 	}
