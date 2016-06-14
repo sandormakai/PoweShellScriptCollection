@@ -128,18 +128,83 @@ If ($xmlInfra.configuration.SingleServerInstall.Used -eq "True") {
 	$blnSingleServerInstall = $True
 	Write-Host -ForegroundColor Green "SINGLE"
 	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData "Single server deployment"
+
 	$colSingleHardwareRequirements = Get-ServerHardwareCollection -Single -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	If ($colSingleHardwareRequirements -eq -1) {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "There was a problem when reading Hardware requirements from XML"
+		return -6
+	}
 	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colSingleHardwareRequirements
+
 	$colSingleSupportedOS = Get-RoleSupportedOSCollection -Single -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	If ($colSingleSupportedOS -eq -1) {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "There was a problem when reading Operating System requirements from XML"
+		return -6
+	}
 	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colSingleSupportedOS
+
+	$colSingleSupportedDatabase = Get-RoleSupportedDatabaseCollection -Single -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	If ($colSingleSupportedDatabase -eq -1) {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "There was a problem when reading Database requirements from XML"
+		return -6
+	}
+	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colSingleSupportedDatabase
+
+	$colSingleDomainRole = Get-DomainRoleCollection -Single -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	If ($colSingleDomainRole -eq -1) {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "There was a problem when reading Domain Role requirements from XML"
+		return -6
+	}
+	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colSingleDomainRole
+
+	$colSingleAdditionalSoftwares = Get-AdditionalSoftwareCollection -Single -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	If ($colSingleAdditionalSoftwares -eq -1) {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "There was a problem when reading Additional Software requirements from XML"
+		return -6
+	}
+	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colSingleAdditionalSoftwares
+
+
 } Elseif ($xmlInfra.configuration.MultiServerInstall.Used -eq "True") {
 	$blnMultiServerInstall = $true
 	Write-Host -ForegroundColor Green "MULTI"
 	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData "Multi server deployment"
+
 	$colMultiHardwareRequirements = Get-ServerHardwareCollection -Multi -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	If ($colMultiHardwareRequirements -eq -1) {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "There was a problem when reading Hardware requirements from XML"
+		return -6
+	}
 	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colMultiHardwareRequirements
+
 	$colMultiSupportedOS = Get-RoleSupportedOSCollection -Multi -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	If ($colMultiSupportedOS -eq -1) {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "There was a problem when reading Operating System requirements from XML"
+		return -6
+	}
 	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colMultiSupportedOS
+
+	$colMultiSupportedDatabase = Get-RoleSupportedDatabaseCollection -Multi -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	If ($colMultiSupportedDatabase -eq -1) {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "There was a problem when reading Database requirements from XML"
+		return -6
+	}
+	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colMultiSupportedDatabase
+
+	$colMultiDomainRole = Get-DomainRoleCollection -Multi -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	If ($colMultiDomainRole -eq -1) {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "There was a problem when reading Domain Role requirements from XML"
+		return -6
+	}
+	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colMultiDomainRole
+
+	$colMultiAdditionalSoftwares = Get-AdditionalSoftwareCollection -Multi -xmlServers $xmlInfra -xmlSettings $xmlPrereq
+	If ($colMultiAdditionalSoftwares -eq -1) {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "There was a problem when reading Additional Software requirements from XML"
+		return -6
+	}
+	LogToFile -intLogType $constDATA -strFile $strResultLogFile -strLogData $colMultiAdditionalSoftwares
+
 } Else {
 	LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData "Both Single and Multi server deployment marked as `"FALSE`". At lease one needs to be set to `"TRUE`"..."
 	Write-Host -ForegroundColor Red "ERROR"

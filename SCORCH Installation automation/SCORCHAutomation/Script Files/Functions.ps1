@@ -94,6 +94,7 @@ function Get-ServerHardwareCollection() {
 		}
 	} Else {
 		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Something went wrong with calling Get-ServerHardwareCollection")
+		Return -1
 	}
 	return $colServers
 }
@@ -145,6 +146,7 @@ function Get-RoleSupportedOSCollection() {
 		}
 	} Else {
 		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Something went wrong with calling Get-RoleSupportedOSCollection")
+		Return -1
 	}
 	return $colServers
 }
@@ -167,15 +169,18 @@ function Get-RoleSupportedDatabaseCollection() {
 	If ($Single -eq $True) {
 		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Get-RoleSupportedOSCollection called with parameter Single = " + $Single)
 		$colServers = @()
-		foreach ($objItem in $xmlSettings.configuration.Software.SingleServerInstall.Servers.Server.OperatingSystem.Version) {
-			$objServer = New-Object –TypeName PSObject
-			$objServer | Add-Member –MemberType NoteProperty –Name Name –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.Name
-			$objServer | Add-Member –MemberType NoteProperty –Name IPAddress –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.IPAddress
-			$objServer | Add-Member –MemberType NoteProperty –Name ServerRole –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.Type
-			$objServer | Add-Member –MemberType NoteProperty –Name OSName –Value $objItem.Name
-			$objServer | Add-Member –MemberType NoteProperty –Name VersionNumber –Value $objItem.VersionNumber
-			$objServer | Add-Member –MemberType NoteProperty –Name Editions –Value $objItem.Edition
-			$colServers += $objServer
+		foreach ($objDatabaseType in $xmlSettings.configuration.Software.SingleServerInstall.Servers.Server.Databases.Database) {
+			foreach ($objItem in $objDatabaseType.Versions.Version) {
+				$objServer = New-Object –TypeName PSObject
+				$objServer | Add-Member –MemberType NoteProperty –Name Name –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.Name
+				$objServer | Add-Member –MemberType NoteProperty –Name IPAddress –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.IPAddress
+				$objServer | Add-Member –MemberType NoteProperty –Name ServerRole –Value $xmlServers.configuration.SingleServerInstall.Servers.Server.Type
+				$objServer | Add-Member –MemberType NoteProperty –Name VersionName –Value $objItem.Name
+				$objServer | Add-Member –MemberType NoteProperty –Name VersionNumber –Value $objItem.VersionNumber
+				$objServer | Add-Member –MemberType NoteProperty –Name Editions –Value $objItem.Edition
+				$objServer | Add-Member –MemberType NoteProperty –Name Collation –Value $objDatabaseType.Collation
+				$colServers += $objServer
+			}
 		}
 	} ElseIf ($Multi -eq $True) {
 		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Get-RoleSupportedOSCollection called with parameter Multi = " + $Multi)
@@ -183,26 +188,28 @@ function Get-RoleSupportedDatabaseCollection() {
 		foreach ($objServerInfo in $xmlServers.configuration.MultiServerInstall.Servers.Server) {
 			foreach ($objItem in $xmlSettings.configuration.Software.MultiServerInstall.Servers.Server) {
 				If ($objServerInfo.Type -eq $objItem.Type) {
-					foreach ($objOS in (($xmlSettings.configuration.Software.MultiServerInstall.Servers.Server | ? {$_.Type -eq $objItem.Type}).OperatingSystem.Version)) {
-						$objServer = New-Object –TypeName PSObject
-						$objServer | Add-Member –MemberType NoteProperty –Name Name –Value $objServerInfo.Name
-						$objServer | Add-Member –MemberType NoteProperty –Name IPAddress –Value $objServerInfo.IPAddress
-						$objServer | Add-Member –MemberType NoteProperty –Name ServerRole –Value $objServerInfo.Type
-						$objServer | Add-Member –MemberType NoteProperty –Name OSName –Value $objOS.Name
-						$objServer | Add-Member –MemberType NoteProperty –Name VersionNumber –Value $objOS.VersionNumber
-						$objServer | Add-Member –MemberType NoteProperty –Name Editions –Value $objOS.Edition
-						$colServers += $objServer
+					foreach ($objDatabaseType in (($xmlSettings.configuration.Software.MultiServerInstall.Servers.Server | ? {$_.Type -eq $objItem.Type}).Databases.Database)) {
+						foreach ($objDatabase in $objDatabaseType.Versions.Version) {
+							$objServer = New-Object –TypeName PSObject
+							$objServer | Add-Member –MemberType NoteProperty –Name Name –Value $objServerInfo.Name
+							$objServer | Add-Member –MemberType NoteProperty –Name IPAddress –Value $objServerInfo.IPAddress
+							$objServer | Add-Member –MemberType NoteProperty –Name ServerRole –Value $objServerInfo.Type
+							$objServer | Add-Member –MemberType NoteProperty –Name VersionName –Value $objDatabase.Name
+							$objServer | Add-Member –MemberType NoteProperty –Name VersionNumber –Value $objDatabase.VersionNumber
+							$objServer | Add-Member –MemberType NoteProperty –Name Editions –Value $objDatabase.Edition
+							$objServer | Add-Member –MemberType NoteProperty –Name Collation –Value $objDatabaseType.Collation
+							$colServers += $objServer
+						}
 					}
 				}
 			}
 		}
 	} Else {
 		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Something went wrong with calling Get-RoleSupportedOSCollection")
+		Return -1
 	}
 	return $colServers
 }
-
-
 
 
 function Get-DomainRoleCollection () {
@@ -254,6 +261,7 @@ function Get-DomainRoleCollection () {
 		}
 	} Else {
 		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Something went wrong with calling Get-DomainRoleCollection")
+		return -1
 	}
 	return $colServers
 
@@ -333,6 +341,7 @@ function Get-AdditionalSoftwareCollection () {
 		}
 	} Else {
 		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Something went wrong with calling Get-AdditionalSoftwareCollection")
+		return -1
 	}
 	return $colServers
 }
