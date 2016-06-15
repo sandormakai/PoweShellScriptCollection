@@ -346,6 +346,50 @@ function Get-AdditionalSoftwareCollection () {
 	return $colServers
 }
 
+function Validate-IpToHostName () {
+	Param(
+	[Parameter(Mandatory=$True,ParameterSetName=’Single’)]
+	[ValidateNotNullOrEmpty()]
+	[switch]$Single,
+	[Parameter(Mandatory=$True,ParameterSetName=’Multi’)]
+	[ValidateNotNullOrEmpty()]
+	[switch]$Multi,
+	[Parameter(Mandatory=$True)]
+	[ValidateNotNullOrEmpty()]
+	[xml]$xmlServers
+	)
+	If ($Single -eq $True) {
+		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("ValidateIpToHostName called with parameter Single = " + $Single)
+		$strHostName = $xmlServers.configuration.SingleServerInstall.Servers.Server.Name
+		Try {
+			[ipaddress]$iaIPAddress = $xmlServers.configuration.SingleServerInstall.Servers.Server.IPAddress
+		} Catch {
+			LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("ServerName: " + $strHostName + " - ErrorMessage: " + $_.Exception.Message)
+			Return -1
+		}
+	} ElseIf ($Multi -eq $True) {
+		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("ValidateIpToHostName called with parameter Multi = " + $Multi)
+		Try {
+			foreach ($objServer in $xmlServers.configuration.MultiServerInstall.Servers.Server) {
+				$strHostName = $objServer.Name
+				[ipaddress]$iaIPAddress = $objServer.IPAddress
+				$blnConnection = Validate-Connection -strServerName $strHostName -iaServerIP $iaIPAddress
+				If ($blnConnection -ne 0) {
+					LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("Connection to the server named " +  + " with IP address: " +  + " failed. Check the connection and try again.")
+					Return -1
+				}
+			}
+		} Catch {
+			LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("ServerName: " + $strHostName + " - ErrorMessage: " + $_.Exception.Message)
+			Return -1
+		}
+	} Else {
+		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Something went wrong with calling ValidateIpToHostName")
+		return -1
+	}
+	return 0
+}
+
 function Get-RegistryValue () {
 
 }

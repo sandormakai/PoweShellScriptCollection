@@ -18,6 +18,10 @@
         <Name>ServerName2</Name>
         <IPAddress>Ipaddress</IPAddress>
       </Server>
+      <Server Type="RunbookServer">
+        <Name>ServerName5</Name>
+        <IPAddress>Ipaddress</IPAddress>
+      </Server>
       <Server Type="OrchestratorWebServices">
         <Name>ServerName3</Name>
         <IPAddress>Ipaddress</IPAddress>
