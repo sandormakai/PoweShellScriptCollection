@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <Principals>
+    <UserAccounts Domain="SERVICES">
+      <DefaultAction>
+        <UserName></UserName>
+        <Domain></Domain>
+      </DefaultAction>
+      <Discovery>
+        <UserName></UserName>
+        <Domain></Domain>
+      </Discovery>
+      <Monitoring>
+        <UserName></UserName>
+        <Domain></Domain>
+      </Monitoring>
+    </UserAccounts>
+    <Groups Domain="SERVICES">
+      <GroupName></GroupName>
+    </Groups>
+  </Principals>
+  <Servers>
+    <Server Type="Local" Version="2012">
+      <ServerName></ServerName>
+      <IPAddress></IPAddress>
+      <Instances Type="DatabaseEngine">
+        <InstanceName></InstanceName>
+      </Instances>
+      <Instances Type="ReportServer">
+        <InstanceName></InstanceName>
+      </Instances>
+    </Server>
+    <Server Type="Remote" Version="2014">
+      <ServerName></ServerName>
+      <IPAddress></IPAddress>
+      <Instances Type="DatabaseEngine">
+        <InstanceName></InstanceName>
+      </Instances>
+      <Instances Type="ReportServer">
+        <InstanceName></InstanceName>
+      </Instances>
+    </Server>
+  </Servers>
+</configuration>
