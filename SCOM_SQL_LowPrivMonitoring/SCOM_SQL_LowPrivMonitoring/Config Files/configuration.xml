@@ -11,15 +11,12 @@
       <UserAccount Type="Monitoring">
         <UserName>Svc_OM_SQL_Mon</UserName>
       </UserAccount>
-      <UserAccount Type="ReportService" Used="True">
-        <UserName>Svc_OM_SQL_RS</UserName>
-      </UserAccount>
     </UserAccounts>
-    <Group Domain="SERVICES">
+    <Group Domain="SERVICES" Used="True">
       <GroupName>DLG_OM_SQLMP_LowPriv</GroupName>
     </Group>
   </Principals>
-  <Instances Type="Database" Version="2012">
+  <Instances Type="Database" Version="2012" ServerName="buzievagy">
     <InstanceName>All</InstanceName>
     <InstanceName>Second</InstanceName>
     <InstanceName>Third</InstanceName>
