@@ -12,11 +12,11 @@
         <UserName>Svc_OM_SQL_Mon</UserName>
       </UserAccount>
     </UserAccounts>
-    <Group Domain="SERVICES" Used="True">
+    <Group Domain="SERVICES">
       <GroupName>DLG_OM_SQLMP_LowPriv</GroupName>
     </Group>
   </Principals>
-  <Instances Type="Database" Version="2012" ServerName="buzievagy">
+  <Instances Type="Database" Version="2012" ServerName="local">
     <InstanceName>All</InstanceName>
     <InstanceName>Second</InstanceName>
     <InstanceName>Third</InstanceName>
