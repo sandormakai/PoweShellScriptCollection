@@ -32,6 +32,7 @@
   <ItemGroup>
     <Compile Include="Script Files\Create-SCOMOverride.ps1" />
     <Compile Include="Script Files\Logging.ps1" />
+    <Compile Include="Script Files\Overrides.ps1" />
     <Compile Include="Script Files\Tester.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

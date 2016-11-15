@@ -2,12 +2,30 @@
 # Tester.ps1
 #
 
-if(-not (Get-Module | ? {$_.Name -eq "OperationsManager"})) {
-	if(Get-Module -ListAvailable | ? {$_.Name -eq "OperationsManager"}) {
-		Import-Module OperationsManager
+function New-ServerList($strFilePath,$colResolutionServers)
+{
+	$colServers = Get-Content -Path $strServerList
+	If (!$colServers) {
+		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("An error occured when the script tried to load the list of server from file: `"" + $strServerList + "`"")
+		Return (-1)
 	}
-	Else {
-		Write-Host "The PS Module named OperationsManager is not available on this machine. Please run the script again on a server where this module is available."
-		Exit -1
+	Foreach ($objServer in $colServers) {
+		If ($colResolutionServers) {
+			Try {
+				Resolve-DnsName -DnsOnly -Name $objServer -Server $colResolutionServers
+			} Catch {
+				LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("The DNS resolution for server `"" + $objServer + "`" did not produce a result. This server will not be included in the installation list")
+			}
+		} Else {
+			Try {
+				Resolve-DnsName -DnsOnly -Name $objServer
+			} Catch {
+				LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("The DNS resolution for server `"" + $objServer + "`" did not produce a result. This server will not be included in the installation list")
+			}
+		}
+		$colReturnList += $objServer
 	}
+	Return $colReturnList
 }
+
+$test = New-ServerList -strFilePath D:\Temp\ServerList.txt -colResolutionServers

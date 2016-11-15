@@ -31,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Script Files\DeploySCOMAgents.ps1" />
+    <Compile Include="Script Files\Logging.ps1" />
     <Compile Include="Script Files\Tester.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
