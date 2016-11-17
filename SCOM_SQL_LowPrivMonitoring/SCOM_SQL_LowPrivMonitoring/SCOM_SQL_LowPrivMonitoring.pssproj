@@ -33,6 +33,7 @@
   <ItemGroup>
     <Compile Include="Config Files\configuration_multi.xml" />
     <Compile Include="Script Files\Logging.ps1" />
+    <Compile Include="Script Files\SCOM_SQLMon_OSPermissions.ps1" />
     <Compile Include="Script Files\SCOM_SQL_OpsMgrSettings.ps1" />
     <Compile Include="Script Files\SCOM_SQL_InstancePermissions.ps1" />
     <Compile Include="Script Files\SCOM_SQL_BasicPermissions.ps1" />
