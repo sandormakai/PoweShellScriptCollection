@@ -2,31 +2,32 @@
 # Script.ps1
 #
 ###################### INIT #############################################################
-[CmdletBinding()]
-Param(
-	[Parameter(Mandatory=$True)]
-	[ValidateScript({Test-Path $_ -PathType ‘Leaf’})]
-	[Alias("ServiceAccount")]
-	[string]$strServiceAccount
-)
 
-$strEventLogSource = "Custom Script Logger"
+$strEventLogName = "Operations Manager"
+$strEventLogSource = "Health Service Script"
+$intErrorEventId = 5002
+$intWarningEventId = 5001
+$intInformationEventid = 5000
 $strScriptName = ($MyInvocation.MyCommand.Name).Substring(0,($MyInvocation.MyCommand.Name).Length-4)
+$strServiceAccount = "COBHAM\SVC-OMSQLAA-001"
 $strDomain = ($strServiceAccount.Split("\"))[0]
 $strAccountName = ($strServiceAccount.Split("\"))[1]
-
-####################### Prepare script to write event log ###############################
-
-$colAvailableEventSources = (Get-ChildItem HKLM:\SYSTEM\CurrentControlSet\Services\EventLog\Application).PSChildName
-If ($colAvailableEventSources -notcontains $strEventLogSource) {
-	New-EventLog -LogName Applcation -Source $strEventLogSource
-}
+$colLocalGroups = @("Performance Monitor Users","Event Log Readers","Users")
+$colPermissionList = @("MethodExecute","Enable","RemoteAccess","ReadSecurity")
+$strAddingRegistryPermission = "N/A"
+$strAddingUserToGroups = "N/A"
+$strAddingFolderPermission = "N/A"
+$strAddingWMIPermission = "N/A"
 
 ####################### Function to finish the script #################
+
 function End-Script($blnWithError) {
+    $Comment = ("Results:`r`nAdding user to groups: " + $strAddingUserToGroups + "`r`nAdding registry permission: " + $strAddingRegistryPermission + "`r`nAdding folder permission: " + $strAddingFolderPermission + "`r`nAdding WMI permissions: " + $strAddingWMIPermission)
 	If ($blnWithError -eq $True) {
+        Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Warning -Category 0 -EventId $intWarningEventId -Message ($strScriptName + ": The script ended with errors! `r`nCheck log for related error messages...`r`n" + $Comment)
 		Exit (-10)
 	} Else {
+        Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Information -Category 0 -EventId $intInformationEventId -Message ($strScriptName + ": The script has finished successfully`r`n" + $Comment)
 		Exit (0)
 	}
 }
@@ -39,12 +40,10 @@ function Add-ADObjectToGroup($strDomain, $strObjectName, $strLocalGroupName) {
 	} Catch {
 		$Comment = $_.Exception
 		If ($Comment -like "*The specified account name is already a member of the group*") {
+            Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Warning -Category 0 -EventId $intWarningEventId -Message ($strScriptName + "Adding user to group called `"" + $strLocalGroupName + "`"`r`nException: " + $Comment)
 			return 0
-		} ElseIf ($Comment -like "*A member could not be added to or removed from the local group because the member does not exist*") {
-			Return -2
-		} ElseIf ($Comment -like "*Access is denied*") {
-			Return -3			
 		} Else {
+            Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Adding user to group called `"" + $strLocalGroupName + "`"`r`nException: " + $Comment)
 			Return -1
 		}
 	}
@@ -56,25 +55,27 @@ function Add-ACLPermission ($strPath, $strUserName, $strPermissions, $strInherit
     Try {
 		$objCurrentAcl = (Get-Item $strPath).GetAccessControl('Access')
 		If ($objCurrentAcl -eq $NULL) {
-			Return -3
+            $Comment = "The object `"" + $strPath + "`" does not exist or the user does not have permission to read it."
+            Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Add specified Filesystem/registry permission...`r`nException: " + $Comment)
+			Return -1
 		}
 		If (($objCurrentAcl.GetType()).Name -eq "RegistrySecurity") {
 			$objRuleToAdd = New-Object System.Security.AccessControl.RegistryAccessRule ($strUserName,$strPermissions,$strInheritance,"None","Allow")
 		} ElseIf (($objCurrentAcl.GetType()).Name -eq "DirectorySecurity") {
 			$objRuleToAdd = New-Object System.Security.AccessControl.FileSystemAccessRule ($strUserName,$strPermissions,$strInheritance,"None","Allow")
 		} Else {
-			Return -4
+            $Comment = "Unknown path type for `"" + $strPath + "`""
+            Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Add specified Filesystem/registry permission...`r`nException: " + $Comment)
+			Return -1
 		}
 		$objCurrentAcl.AddAccessRule($objRuleToAdd)
 		Set-Acl -Path $strPath -AclObject $objCurrentAcl -ErrorAction Stop
 	} Catch {
         $Comment = $_.Exception
-        If ($Comment -like "*access is not allowed*") {
-			Return -2
-        } Else {
-			Return -1
-		}
+        Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Add specified Filesystem/registry permission...`r`nException: " + $Comment)
+        Return -1
     }
+    Return 0
 }
 ####################### Functions to modify WMI Namespace Security ###################
 
@@ -101,7 +102,8 @@ Function Get-AccessMaskFromPermission($strPermissionList) {
 	$accessMask = 0
 	foreach ($strPermission in $strPermissionList) {
 		if (-not $permissionTable.ContainsKey($strPermission.ToLower())) {
-			LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("Unknown permission: $strPermission`nValid permissions: $($permissionTable.Keys)")
+            $Comment = "Unknown permission: $strPermission`nValid permissions: $($permissionTable.Keys)"
+            Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Modify WMI Namespace Security...`r`nException: " + $Comment)
 			Return -1
 		}
 		$accessMask += $permissionTable[$strPermission.ToLower()]
@@ -137,7 +139,8 @@ Param (
 	
 	$output = Invoke-WmiMethod @invokeparams -Name GetSecurityDescriptor
 	if ($output.ReturnValue -ne 0) {
-		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("GetSecurityDescriptor failed: $($output.ReturnValue)")
+        $Comment = "GetSecurityDescriptor failed: $($output.ReturnValue)"
+        Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Modify WMI Namespace Security...`r`nException: " + $Comment)
 		Return -1
 	}
 	
@@ -168,19 +171,21 @@ Param (
 	$win32account = Get-WmiObject @getparams
 	
 	if ($win32account -eq $null) {
-		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("Account was not found: $strAccount")
-		Return -2
+        $Comment = "Account was not found: $strAccount"
+		Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Modify WMI Namespace Security...`r`nException: " + $Comment)
+		Return -1
 	}
 	
 	switch ($strOperation) {
 		"add" {
 			if ($strPermissionList -eq $null) {
-				LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("No permission was specified for `"ADD`" function")
-				return -3
+                $Comment = "No permission was specified for `"ADD`" function"
+                Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Modify WMI Namespace Security...`r`nException: " + $Comment)
+				return -1
 			}
 			$accessMask = Get-AccessMaskFromPermission($strPermissionList)
 			If ($accessMask -eq -1) {
-				return -4
+				return -1
 			}
 			
 			$ace = (New-Object System.Management.ManagementClass("win32_Ace")).CreateInstance()
@@ -209,8 +214,9 @@ Param (
 		}
 		"delete" {
 			if ($strPermissionList -ne $null) {
-				LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("Permissions cannot be specified for a `"DELETE`" operation")
-				return -3
+                $Comment = "Permissions cannot be specified for a `"DELETE`" operation"
+				Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Modify WMI Namespace Security...`r`nException: " + $Comment)
+				return -1
 			}
 			[System.Management.ManagementBaseObject[]]$newDACL = @()
 			foreach ($ace in $acl.DACL) {
@@ -223,8 +229,9 @@ Param (
 		}
 		
 		default {
-			LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("Unknown operation: $strOperation`nAllowed operations: add delete")
-			return -5
+            $Comment = "Unknown operation: $strOperation`nAllowed operations: add delete"
+            Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Modify WMI Namespace Security...`r`nException: " + $Comment)
+			return -1
 		}
 	}
 	
@@ -232,56 +239,58 @@ Param (
 	
 	$output = Invoke-WmiMethod @setparams
 	if ($output.ReturnValue -ne 0) {
-		LogToFile -intLogType $constERROR -strFile $strLogFile -strLogData ("SetSecurityDescriptor failed: $($output.ReturnValue)")
-		return -6
+        $Comment = "SetSecurityDescriptor failed: $($output.ReturnValue)"
+        Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Modify WMI Namespace Security...`r`nException: " + $Comment)
+		return -1
 	}
 }
 
 ####################### Starting the script ##########################################
 
-#???
+Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Information -Category 0 -EventId $intInformationEventId -Message ($strScriptName + ": Started...")
 
-######################## Adding users to local groups ##################
+######################## Check whether it is a cluster member ########################
 
-###### Action Account to "Performance Monitor Users", "Event Log Readers" and "Users" ##############
-$colLocalGroups = @("Performance Monitor Users","Event Log Readers","Users")
-foreach ($objLocalGroup in $colLocalGroups) {
-	$return = Add-ADObjectToGroup -strDomain $strDomain -strObjectName $strAccountName -strLocalGroupName $objLocalGroup
-	If ($return -eq -1) {
-		Write-Host -ForegroundColor Red "FAIL!"
-	} ElseIf ($return -eq -2) {
-		Write-Host -ForegroundColor Red "FAIL!"
-		End-Script -blnWithError $True
-	} ElseIf ($return -eq -3) {
-		Write-Host -ForegroundColor Red "FAIL!"
-		End-Script -blnWithError $True
-	} Else {
-		Write-Host -ForegroundColor Green "DONE!"
-	}
+$objCluster = Get-WmiObject -Namespace "Root\MSCluster" -Class "MSCluster_Cluster"
+If (!$objCluster) {
+    $blnIsCluster = $False
+} Else {
+    $blnIsCluster = $True
+}
+
+If ($blnIsCluster) {
+    Import-Module FailoverClusters
 }
 
 ######################## Set Registry permissions ######################
 
-$colInstances = Get-WmiObject -Namespace ROOT\Microsoft\SqlServer\ComputerManagement11 -Class SqlServiceAdvancedProperty | ? {($_.PropertyName -eq "INSTANCEID") -and ($_.PropertyIndex -eq 12)}
+[string]$strInstanceVersion = ""
+
+$colInstances = Get-WmiObject -Namespace ROOT\Microsoft\SqlServer\ComputerManagement11 -Class SqlServiceAdvancedProperty -ErrorAction SilentlyContinue | ? {($_.PropertyName -eq "INSTANCEID") -and ($_.PropertyIndex -eq 12)}
 If (!$colInstances) {
-	$colInstances = Get-WmiObject -Namespace ROOT\Microsoft\SqlServer\ComputerManagement12 -Class SqlServiceAdvancedProperty | ? {($_.PropertyName -eq "INSTANCEID") -and ($_.PropertyIndex -eq 12)}
+	$colInstances = Get-WmiObject -Namespace ROOT\Microsoft\SqlServer\ComputerManagement12 -Class SqlServiceAdvancedProperty -ErrorAction SilentlyContinue | ? {($_.PropertyName -eq "INSTANCEID") -and ($_.PropertyIndex -eq 12)}
 	If (!$colInstances) {
-		$colInstances = Get-WmiObject -Namespace ROOT\Microsoft\SqlServer\ComputerManagement13 -Class SqlServiceAdvancedProperty | ? {($_.PropertyName -eq "INSTANCEID") -and ($_.PropertyIndex -eq 12)}
+		$colInstances = Get-WmiObject -Namespace ROOT\Microsoft\SqlServer\ComputerManagement13 -Class SqlServiceAdvancedProperty -ErrorAction SilentlyContinue | ? {($_.PropertyName -eq "INSTANCEID") -and ($_.PropertyIndex -eq 12)}
 		If (!$colInstances) {
+            $Comment = "No SQL server installation could be found on this server"
+            Write-EventLog -LogName $strEventLogName -Source $strEventLogSource -EntryType Error -Category 0 -EventId $intErrorEventId -Message ($strScriptName + "Set registry permission...`r`nException: " + $Comment)
 			End-Script -blnWithError $true
 		} Else {
+			$strInstanceVersion = "2016"
 			$colRegKeys = @("HKLM:\Software\Microsoft\Microsoft SQL Server")
 			foreach ($objInstance in $colInstances) {
 				$colRegKeys += ("HKLM:\Software\Microsoft\Microsoft SQL Server\" + $objInstance.PropertyStrValue + "\MSSQLServer\Parameters")
 			}
 		}
 	} Else {
+		$strInstanceVersion = "2014"
 		$colRegKeys = @("HKLM:\Software\Microsoft\Microsoft SQL Server")
 		foreach ($objInstance in $colInstances) {
 			$colRegKeys += ("HKLM:\Software\Microsoft\Microsoft SQL Server\" + $objInstance.PropertyStrValue + "\MSSQLServer\Parameters")
 		}
 	}
 } Else {
+	$strInstanceVersion = "2012"
 	$colRegKeys = @("HKLM:\Software\Microsoft\Microsoft SQL Server")
 	foreach ($objInstance in $colInstances) {
 		$colRegKeys += ("HKLM:\Software\Microsoft\Microsoft SQL Server\" + $objInstance.PropertyStrValue + "\MSSQLServer\Parameters")
@@ -294,87 +303,71 @@ $strRegInheritance = "ObjectInherit,ContainerInherit"
 Foreach ($objRegKey in $colRegKeys) {
 	$return = Add-ACLPermission -strPath $objRegKey -strUserName ($strDomain + "\" + $strAccountName) -strPermissions $strRegPermissions -strInheritance $strRegInheritance
 	If ($return -eq -1) {
-		Write-Host -ForegroundColor Red "FAIL!"
-	} ElseIf ($return -eq -2) {
-		Write-Host -ForegroundColor Red "FAIL!"
-		End-Script -blnWithError $True
-	} ElseIf ($return -eq -3) {
-		Write-Host -ForegroundColor Red "FAIL!"
-		End-Script -blnWithError $True
-	} ElseIf ($return -eq -4) {
-		Write-Host -ForegroundColor Red "FAIL!"
-		End-Script -blnWithError $True			
+		$strAddingRegistryPermission = "ERROR"
 	} Else {
-		Write-Host -ForegroundColor Green "DONE!"
+		$strAddingRegistryPermission = "OK"
+	}
+}
+
+######################## Adding users to local groups ##################
+
+foreach ($objLocalGroup in $colLocalGroups) {
+	$return = Add-ADObjectToGroup -strDomain $strDomain -strObjectName $strAccountName -strLocalGroupName $objLocalGroup
+	If ($return -eq -1) {
+		$strAddingUserToGroups = "ERROR"
+	} Else {
+		$strAddingUserToGroups = "OK"
 	}
 }
 
 ######################## Set permission to Windows Temp folder #########
 
-Write-Host -ForegroundColor Magenta "`r`nSetting up permission to Windows Temp folder"
-
 $strFolder = "C:\Windows\Temp"
 $strFolderPermission = "Modify"
 
-foreach ($objAccount in $colAccounts | ? {$_.Type -eq "Monitoring"}) {
-	Write-Host -ForegroundColor Yellow -NoNewline ("Granting `"" + $strFolderPermission + "`" permissions to object `"" + $objAccount.Domain + "\" + $objAccount.UserName + "`" on folder `"" + $strFolder + "`"...")
-	LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Granting `"" + $strFolderPermission + "`" permissions to object `"" + $objAccount.Domain + "\" + $objAccount.UserName + "`" on folder `"" + $strFolder + "`"...")
-	$return = Add-ACLPermission -strPath $strFolder -strUserName ($objAccount.Domain + "\" + $objAccount.UserName) -strPermissions $strFolderPermission -strInheritance $strRegInheritance
-	If ($return -eq -1) {
-		Write-Host -ForegroundColor Red "FAIL!"
-	} ElseIf ($return -eq -2) {
-		Write-Host -ForegroundColor Red "FAIL!"
-		End-Script -blnWithError $True
-	} ElseIf ($return -eq -3) {
-		Write-Host -ForegroundColor Red "FAIL!"
-		End-Script -blnWithError $True
-		} ElseIf ($return -eq -4) {
-			Write-Host -ForegroundColor Red "FAIL!"
-			End-Script -blnWithError $True			
-	} Else {
-		Write-Host -ForegroundColor Green "DONE!"
-	}
+$return = Add-ACLPermission -strPath $strFolder -strUserName ($strDomain + "\" + $strAccountName) -strPermissions $strFolderPermission -strInheritance $strRegInheritance
+If ($return -eq -1) {
+	$strAddingFolderPermission = "ERROR"
+} Else {
+	$strAddingFolderPermission = "OK"
 }
+
+######################## Set Cluster permission ########################
+
+If ($blnIsCluster){
+    Grant-ClusterAccess -User $strServiceAccount -Full
+}
+
 
 ######################## Set WMI namespace permissions #################
 
-Write-Host -ForegroundColor Magenta "`r`nSetting Up WMI namespace permissions"
-
-If ($objInstances.InstanceVersion -eq "2012") {
-	$colWMINameSpaces = @("root","root\cimv2","root\default","Root\Microsoft\SqlServer\ComputerManagement11")
-} ElseIf ($objInstances.InstanceVersion -eq "2014") {
-	$colWMINameSpaces = @("root","root\cimv2","root\default","Root\Microsoft\SqlServer\ComputerManagement12")
+If ($strInstanceVersion -eq "2012") {
+	$colWMINameSpaces = @("root","root\cimv2","root\default","root\Microsoft\SqlServer\ComputerManagement11")
+} ElseIf ($strInstanceVersion -eq "2014") {
+	$colWMINameSpaces = @("root","root\cimv2","root\default","root\Microsoft\SqlServer\ComputerManagement12")
+} ElseIf ($strInstanceVersion -eq "2016") {
+	$colWMINameSpaces = @("root","root\cimv2","root\default","root\Microsoft\SqlServer\ComputerManagement13")
 }
-$colPermissionList = @("MethodExecute","Enable","RemoteAccess","ReadSecurity")
+
+If ($blnIsCluster) {
+    $colWMINameSpaces += "root\MSCluster"
+}
 
 foreach ($objWMINameSpace in $colWMINameSpaces) {
-	foreach ($objAccount in $colAccounts | ? {$_.Type -eq "Discovery" -or $_.Type -eq "Monitoring" -or $_.Type -eq "DefaultAction"}) {
-		Write-Host -ForegroundColor Yellow -NoNewline ("Granting `"" + $colPermissionList + "`" permissions to object `"" + $objAccount.Domain + "\" + $objAccount.UserName + "`" on WMI Namespace `"" + $objWMINameSpace + "`"...")
-		LogToFile -intLogType $constINFO -strFile $strLogFile -strLogData ("Granting `"" + $colPermissionList + "`" permissions to object `"" + $objAccount.Domain + "\" + $objAccount.UserName + "`" on WMI Namespace `"" + $objWMINameSpace + "`"...")
-		$return = Set-WmiNamespaceSecurity -strNameSpace $objWMINameSpace -strOperation "add" -strAccount ($objAccount.Domain + "\" + $objAccount.UserName) -strPermissionList $colPermissionList
-		If ($return -eq -1) {
-			Write-Host -ForegroundColor Red "FAIL!"
-		} ElseIf ($return -eq -2) {
-			Write-Host -ForegroundColor Red "FAIL!"
-			End-Script -blnWithError $True
-		} ElseIf ($return -eq -3) {
-			Write-Host -ForegroundColor Red "FAIL!"
-			End-Script -blnWithError $True
-		} ElseIf ($return -eq -4) {
-			Write-Host -ForegroundColor Red "FAIL!"
-			End-Script -blnWithError $True			
-		} ElseIf ($return -eq -5) {
-			Write-Host -ForegroundColor Red "FAIL!"
-			End-Script -blnWithError $True			
-		} ElseIf ($return -eq -6) {
-			Write-Host -ForegroundColor Red "FAIL!"
-			End-Script -blnWithError $True			
-		} Else {
-			Write-Host -ForegroundColor Green "DONE!"
-		}
+	$return = Set-WmiNamespaceSecurity -strNameSpace $objWMINameSpace -strOperation "add" -strAccount ($strDomain + "\" + $strAccountName) -strPermissionList $colPermissionList
+	If ($return -eq -1) {
+    	$strAddingWMIPermission = "ERROR"
+    } Else {
+	    $strAddingWMIPermission = "OK"
 	}
 }
 
-######################## Script finished ###############################
+############## Check whether the script finished successfully or not ################
+
+If (($strAddingRegistryPermission -eq "ERROR") -or ($strAddingWMIPermission -eq "ERROR") -or ($strAddingFolderPermission -eq "ERROR") -or ($strAddingUserToGroups -eq "ERROR")) {
+    End-Script -blnWithError $True
+}
+
+######################## Script finished successfully ###############################
 
 End-Script -blnWithError $False
