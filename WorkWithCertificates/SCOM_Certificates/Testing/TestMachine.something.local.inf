@@ -1,0 +1,8 @@
+[NewRequest]
+Subject="CN=TestMachine.something.local"
+KeyLength=2048
+KeySpec=1
+KeyUsage=0xf0
+MachineKeySet=TRUE
+[RequestAttributes]
+CertificateTemplate="This is a template"
