@@ -24,7 +24,7 @@ Param(
 	[Alias("Template")]
 	[string]$strTemplateName,
 	[Parameter(Mandatory=$False)]
-	[ValidateList("NORMAL","DEBUG")]
+	[ValidateSet("NORMAL","DEBUG")]
 	[Alias("ScriptVerbose")]
 	[string]$strScriptVerbose
 
@@ -34,6 +34,7 @@ $strScriptPath = $NULL
 $strScriptName = $NULL
 $strLogName = "Custom Scripts"
 $strCertificateStore = "Cert:\LocalMachine\My"
+$strCAName = ""
 
 function Get-ScriptDirectory
 {
@@ -51,6 +52,8 @@ function Get-ScriptDirectory
 If (-not($strScriptPath = Get-ScriptDirectory)) {
 	Write-Host "The script cannot determinde its working directory. Without this parameter the script cannot run. Please check and run the script again!"
 	Exit -2
+} ElseIf (!(Test-Path -Path ($strScriptPath + "\Certificates"))) {
+	New-Item -Path $strScriptPath -Name "Certificates" -ItemType Directory
 }
 
 .((Get-ScriptDirectory) + "..\_Basic\Logging.ps1")
@@ -66,8 +69,8 @@ $strCertPassword = Read-Host "Enter Password used for certificates..." -AsSecure
 
 ######################### Initialization ##################################################################################################################
 
-function Generate-InfFile ([string]$strComputerName,[string]$strTemplateName) {
-	$strFileName = ($strScriptPath + "\" + $strComputerName + ".inf")
+function Generate-InfFile ([string]$strComputerName,[string]$strTemplate) {
+	$strFileName = ($strScriptPath + "\" + "_TempRequest.inf")
 	If (Get-ChildItem -Path $strFileName -ErrorAction SilentlyContinue) {
 		Remove-Item -Path $strFileName
 	}
@@ -78,18 +81,26 @@ function Generate-InfFile ([string]$strComputerName,[string]$strTemplateName) {
 	Add-Content -Path $strFileName -Value "KeyUsage=0xf0"
 	Add-Content -Path $strFileName -Value "MachineKeySet=TRUE"
 	Add-Content -Path $strFileName -Value "[RequestAttributes]"
-	Add-Content -Path $strFileName -Value ("CertificateTemplate=`"{0}`"" -f $strTemplateName)
+	Add-Content -Path $strFileName -Value ("CertificateTemplate=`"{0}`"" -f $strTemplate)
 }
 
-function Request-Cert ($strReqFile) {
+function Create-CertRequest ([string]$strInfFile) {
+	$strFileName = ($strScriptPath + "\" + "_TempRequest.req")
+	.\Certreq -new $strInfFile  $strFileName
+}
 
+function Submit-CertRequest ([string]$strReqFile, [string]$strComputerName) {
+	.\Certreq -submit -config $strCAName $strReqFile ("{0}\{1}.cer" -f $strCertFolder, $strComputerName)
+}
+
+function Install-Certificate ([string]$strCerFile) {
+	.\Certreq -accept $strCerFile
 }
 
 function Generate-PFXCert ($strComputerName) {
 	$objCert = Get-ChildItem -Path $strCertificateStore | 
 	% {
 	$_ | Select `
-		Friendlyname,
 		Thumbprint,
 		@{N="Template";E={($_.Extensions | ?{$_.oid.Friendlyname -match "Certificate Template Information"}).Format(0) -replace "(.+)?=(.+)\((.+)?", '$2'}},
 		@{N="Subject";E={($_.SubjectName.name -replace ".*=")}}
@@ -101,3 +112,17 @@ function Generate-PFXCert ($strComputerName) {
 	}
 }
 
+################### Read serverlist or servername ###############################
+If ($blnMultiple) {
+	$colComputers = Get-Content $strServerList
+} Else {
+	$colComputers = $strServerName
+}
+
+################### Generate PFX file for all servers in the list ################
+Foreach ($objComputer in $colComputers) {
+	Generate-InfFile -strComputerName $objComputer -strTemplate $strTemplateName
+	Submit-CertRequest -strReqFile ($strScriptPath + "\" + "_TempRequest.req") -strComputerName $objComputer
+	Install-Certificate -strCerFile ($strScriptPath + "\" + $objComputer + ".cer")
+	Generate-PFXCert -strComputerName $objComputer
+}
