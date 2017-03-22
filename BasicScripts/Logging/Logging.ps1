@@ -20,7 +20,7 @@ IF ((Test-Path variable:constNORMAL) -eq 0) {
 
 function IsLogExist ($strLogName, $strSource) {
 	Try {
-		$objLog = Get-EventLog -LogName $strLogName -ErrorAction SilentlyContinue
+		$objLog = Get-EventLog -LogName $strLogName -ErrorAction Stop
 	} Catch {
 		New-EventLog -LogName $strLogName -Source $strSource
 		Write-EventLog -LogName $strLogName -Source $strSource -EntryType Information -EventId constEventINF -Category 0 -Message "The necessary log has been created..."

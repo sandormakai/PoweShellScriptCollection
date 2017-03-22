@@ -187,14 +187,18 @@ function End-Script($blnWithError) {
 		Write-EventLog –LogName Application –Source $strScriptName –EntryType Warning `
 		    –EventID 7001 –Message	("The script {0} finished with errors. Please check the" -f $strScriptName + `
 			"log for related entries. Fix the errors and run the script again.") -Category 0
-		Write-Host "Press any key to continue..."
-		$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+		If ($blnVerbose) {
+			Write-Host "Press any key to continue..."
+			$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+		}
 		Exit (-10)
 	} Else {
 		Write-EventLog –LogName Application –Source $strScriptName –EntryType Information `
 		    –EventID 7000 –Message ("The script {0} finished successfully" -f $strScriptName) -Category 0
-		Write-Host "Press any key to continue..."
-		$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+		If ($blnVerbose) {
+			Write-Host "Press any key to continue..."
+			$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+		}
 		Exit (0)
 	}
 }
@@ -218,7 +222,7 @@ Try {
 	Cleanup Time Unit (Full): {12} `
 	Cleanup Timeframe (Full): {13} `
 	Keep Diff Backup for x Full: {14}" -f $strScriptName, $blnFull, $blnSimple, `
-	$strStorageAccountName, $strStorageAccountKey, $strContainerForFull, $strExtensionForFull, `
+	$strStorageAccountName, ($strStorageAccountKey.Substring(0,10)), $strContainerForFull, $strExtensionForFull, `
 	$strContainerForDiff, $strExtensionForDiff, $strContainerForTrn, $strExtensionForTrn, `
 	$strFilterForFileName, $chrCleanupTimeUnitFull, $intCleanupTimeFrameFull, `
 	$intKeepDiffForFull) -Category 0 -ErrorAction Stop
@@ -241,7 +245,7 @@ Try {
 	Cleanup Time Unit (Full): {12} `
 	Cleanup Timeframe (Full): {13} `
 	Keep Diff Backup for x Full: {14}" -f $strScriptName, $blnFull, $blnSimple, `
-	$strStorageAccountName, $strStorageAccountKey, $strContainerForFull, $strExtensionForFull, `
+	$strStorageAccountName, ($strStorageAccountKey.Substring(0,10)), $strContainerForFull, $strExtensionForFull, `
 	$strContainerForDiff, $strExtensionForDiff, $strContainerForTrn, $strExtensionForTrn, `
 	$strFilterForFileName, $chrCleanupTimeUnitFull, $intCleanupTimeFrameFull, `
 	$intKeepDiffForFull) -Category 0 -ErrorAction Stop
@@ -264,7 +268,7 @@ Try {
 	Cleanup Time Unit (Full): {12} `
 	Cleanup Timeframe (Full): {13} `
 	Keep Diff Backup for x Full: {14}" -f $strScriptName, $blnFull, $blnSimple, `
-	$strStorageAccountName, $strStorageAccountKey, $strContainerForFull, $strExtensionForFull, `
+	$strStorageAccountName, ($strStorageAccountKey.Substring(0,10)), $strContainerForFull, $strExtensionForFull, `
 	$strContainerForDiff, $strExtensionForDiff, $strContainerForTrn, $strExtensionForTrn, `
 	$strFilterForFileName, $chrCleanupTimeUnitFull, $intCleanupTimeFrameFull, `
 	$intKeepDiffForFull) -Category 0 -ErrorAction Stop
